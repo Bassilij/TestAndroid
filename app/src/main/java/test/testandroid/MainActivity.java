@@ -8,13 +8,8 @@ import android.widget.TextView;
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import test.testandroid.Retrofit.App;
 import test.testandroid.Retrofit.Users;
 
 public class MainActivity extends MvpAppCompatActivity implements MainView {
@@ -41,7 +36,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
         mHelloWorldTextView = ((TextView) findViewById(R.id.TextID));
 
-        initializeData();
+        //initializeData();
         //initializeAdapter();
         ////////////////////////////////////////////////////
 
@@ -147,60 +142,13 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     @Override
-    public void showMessage(int message) {
+    public void showMessage(int message, List<Users> persons) {
         mHelloWorldTextView.setText(message);
-    }
-    /*
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-///////////////////////////////////////////////////////////////////////////
-        App.getApi().getUsers().enqueue(new Callback<List<Users>>() {
-            @Override
-            public void onResponse(Call<List<Users>> call, Response<List<Users>> response) {
-                //Данные успешно пришли, но надо проверить response.body() на null
-                TextView textView = (TextView)findViewById(R.id.TextID);
-                textView.setText(response.body().get(0).getName());
-            }
-            @Override
-            public void onFailure(Call<List<Users>> call, Throwable t) {
-                TextView textView = (TextView)findViewById(R.id.TextID);
-                textView.setText(t.toString());
-                //Произошла ошибка
-            }
-        });
-///////////////////////////////////////////////////////////////////////////
-
-    }*/
-
-    private void initializeData(){
-        App.getApi().getUsers().enqueue(new Callback<List<Users>>() {
-            @Override
-            public void onResponse(Call<List<Users>> call, Response<List<Users>> response) {
-                //Данные успешно пришли, но надо проверить response.body() на null
-                persons = new ArrayList<>();
-                for (int i = 0; i < response.body().size(); i++) {
-                    persons.add(response.body().get(i));
-                    System.out.println("Test!!! response " + response.body().get(i).toString());
-                    System.out.println("Test!!! response " + persons.get(i).toString());
-                }
-                System.out.println("Test!!! response " + response.body().toString());
-                initializeAdapter();///////!
-            }
-            @Override
-            public void onFailure(Call<List<Users>> call, Throwable t) {
-                //Произошла ошибка
-            }
-        });
-//        persons = new ArrayList<>();
-//        persons.add(new Person("Emma Wilson", "23 years old", R.drawable.emma));
-//        persons.add(new Person("Lavery Maiss", "25 years old", R.drawable.lavery));
-//        persons.add(new Person("Lillie Watts", "35 years old", R.drawable.lillie));
+        this.persons = persons;
+        initializeAdapter();
     }
 
     private void initializeAdapter(){
-        System.out.println("Test!!! response " + persons.get(0).toString());
         RVAdapter adapter = new RVAdapter(persons);
         rv.setAdapter(adapter);
     }
