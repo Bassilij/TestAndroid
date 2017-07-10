@@ -1,20 +1,14 @@
 package test.testandroid;
 
-import android.graphics.Color;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.bumptech.glide.Glide;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -29,12 +23,30 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     MainPresenter mHelloWorldPresenter;
 
     private TextView mHelloWorldTextView;
-
+    //22//
+    private List<Users> persons;
+    private RecyclerView rv;
+    //22//
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ///////////////////////RV///////////////////////////
+        rv=(RecyclerView)findViewById(R.id.message);
 
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        rv.setLayoutManager(llm);
+        rv.setHasFixedSize(true);
+
+
+        mHelloWorldTextView = ((TextView) findViewById(R.id.TextID));
+
+        initializeData();
+        //initializeAdapter();
+        ////////////////////////////////////////////////////
+
+
+        /*
         mHelloWorldTextView = ((TextView) findViewById(R.id.TextID));
 
         App.getApi().getUsers().enqueue(new Callback<List<Users>>() {
@@ -44,7 +56,12 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
                 TextView textView = (TextView)findViewById(R.id.TextID);
                 textView.setText(response.body().get(0).getName());
                 //////////////////////////////////////////////////////////////////////////////////////
-                LinearLayout mainLayout = (LinearLayout) findViewById(R.id.message);
+                RecyclerView mainLayout = (RecyclerView) findViewById(R.id.message);
+                //LinearLayoutManager llm = new LinearLayoutManager(context);
+                //mainLayout.setLayoutManager(llm);
+
+
+
                 for (int i = 0; i < response.body().size(); i++) {
                     //CardView(i, response, mainLayout, response.body().get(i).getAvatar());
                     String name = response.body().get(i).getName();
@@ -126,7 +143,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
                 //Произошла ошибка
             }
         });
-
+*/
     }
 
     @Override
@@ -157,38 +174,34 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     }*/
 
-    public void CardView(int i, Response response, LinearLayout mainLayout, String link){
-        String name = "";// = response.body().get(i).getName();
-        String age = "";// = response.body().get(i).getAge().toString()+"лет, ";
-        String similarity = "";// = response.body().get(i).getSimilarity().toString()+"%";
-        //String link;// = response.body().get(i).getAvatar();
-        String date = "";// = response.body().get(i).getLastSeen();
+    private void initializeData(){
+        App.getApi().getUsers().enqueue(new Callback<List<Users>>() {
+            @Override
+            public void onResponse(Call<List<Users>> call, Response<List<Users>> response) {
+                //Данные успешно пришли, но надо проверить response.body() на null
+                persons = new ArrayList<>();
+                for (int i = 0; i < response.body().size(); i++) {
+                    persons.add(response.body().get(i));
+                    System.out.println("Test!!! response " + response.body().get(i).toString());
+                    System.out.println("Test!!! response " + persons.get(i).toString());
+                }
+                System.out.println("Test!!! response " + response.body().toString());
+                initializeAdapter();///////!
+            }
+            @Override
+            public void onFailure(Call<List<Users>> call, Throwable t) {
+                //Произошла ошибка
+            }
+        });
+//        persons = new ArrayList<>();
+//        persons.add(new Person("Emma Wilson", "23 years old", R.drawable.emma));
+//        persons.add(new Person("Lavery Maiss", "25 years old", R.drawable.lavery));
+//        persons.add(new Person("Lillie Watts", "35 years old", R.drawable.lillie));
+    }
 
-        LayoutInflater inflater = getLayoutInflater();
-        View card = inflater.inflate(R.layout.card, null);
-
-        TextView Name = (TextView) card.findViewById(R.id.Name);
-        Name.setText(card.getContext().toString());
-
-        TextView Age = (TextView) card.findViewById(R.id.Age);
-        Age.setText(age);
-
-        TextView Similarity = (TextView) card.findViewById(R.id.Similarity);
-        Similarity.setText(similarity);
-
-        TextView Date = (TextView) card.findViewById(R.id.Date);
-        Date.setText(date);
-
-        ImageView imageView = (ImageView) findViewById(R.id.Image);
-
-        try {
-            Glide
-                    .with(card.getContext())
-                    .load(link)
-                    .override(75, 75)
-                    .into(imageView);
-        } catch (Exception e){}
-
-        mainLayout.addView(card);
+    private void initializeAdapter(){
+        System.out.println("Test!!! response " + persons.get(0).toString());
+        RVAdapter adapter = new RVAdapter(persons);
+        rv.setAdapter(adapter);
     }
 }
